@@ -21,8 +21,8 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         self.mapView.delegate = self
         
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 42.001783, longitude: 21.405396), addressDictionary: nil))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 42.0044269, longitude: 21.3894716), addressDictionary:nil))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115), addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405), addressDictionary:nil))
         request.requestsAlternateRoutes = true
         request.transportType = .walking
         
