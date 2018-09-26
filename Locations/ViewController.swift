@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var mapView: MKMapView!
     
     let locationManager = CLLocationManager()
-    let regionInMeters: Double = 3000
+    let regionInMeters: Double = 10000
     
     var previousLocations: [CLLocation] = []
     
@@ -27,7 +27,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
             checkLocationServices()
         
-        createMapPoints()
+        //createMapPoints()
+        directions()
+        
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) ->MKOverlayRenderer {
+            let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
+            renderer.strokeColor = UIColor.blue
+            return renderer
+        }
 
     }
     
@@ -51,6 +58,43 @@ class ViewController: UIViewController {
         
         //print("pointsPerMeterAtLatitude : \(pointsPerMeterAtLatitude)")
     }
+    
+    // request and response for MKDirections
+    func directions(){
+        
+        let skopjeZooMapItem = MKMapItem(placemark: MKPlacemark(coordinate: skopjeZooCoordinates))
+        let cityMallMapItem = MKMapItem(placemark: MKPlacemark(coordinate: cityMallCoordinates))
+        
+        let request = MKDirections.Request()
+        request.source = skopjeZooMapItem
+        request.destination = cityMallMapItem
+        request.requestsAlternateRoutes = true
+        request.transportType = .automobile
+        
+        let directions = MKDirections(request: request)
+        
+        directions.calculate { [unowned self] response, error in
+            
+            guard let unwrappedResponse = response else { return }
+            
+            for route in unwrappedResponse.routes{
+                self.mapView.addOverlay(route.polyline)
+                self.mapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
+                print("overlay added")
+            }
+            
+        }
+        
+    }
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        
+        let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
+        renderer.strokeColor = UIColor.blue
+        return renderer
+    }
+    
+    
     
     
     
@@ -97,7 +141,7 @@ class ViewController: UIViewController {
         case .authorizedWhenInUse:
            
             mapView.showsUserLocation = true
-            centerViewOnUserLocation()
+            //centerViewOnUserLocation()
              print("authorization when in use")
             locationManager.startUpdatingLocation()
             break
