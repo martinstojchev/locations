@@ -18,15 +18,38 @@ class ViewController: UIViewController {
     
     var previousLocations: [CLLocation] = []
     
-    var userLocation: MKUserLocation?
+    let cityMallCoordinates = CLLocationCoordinate2D(latitude: 42.0044232, longitude: 21.3829109)
+    let skopjeZooCoordinates = CLLocationCoordinate2D(latitude: 42.0043068, longitude: 21.3969873)
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
             checkLocationServices()
         
-        
-        
+        createMapPoints()
 
+    }
+    
+    func createMapPoints(){
+        
+        let cityMallMapPoint = MKMapPoint(cityMallCoordinates)
+        
+        let skopjeZooMapPoint = MKMapPoint(skopjeZooCoordinates)
+        
+        let cityMallLocation = CLLocation(latitude: cityMallCoordinates.latitude, longitude: cityMallCoordinates.longitude)
+        let skopjeZooLocation = CLLocation(latitude: skopjeZooCoordinates.latitude, longitude: skopjeZooCoordinates.longitude)
+        //let usersLocationCoordinates = mapView.userLocation.coordinate
+        //let usersLocationMapPoint = MKMapPoint(usersLocationCoordinates)
+        
+        let distance = cityMallLocation.distance(from: skopjeZooLocation)
+        
+        
+        print("distance between two CLLocations: \(distance)")
+        
+        //let pointsPerMeterAtLatitude = MKMapPointsPerMeterAtLatitude(cityMallMapPoint.coordinate.latitude)
+        
+        //print("pointsPerMeterAtLatitude : \(pointsPerMeterAtLatitude)")
     }
     
     
@@ -105,14 +128,15 @@ extension ViewController: CLLocationManagerDelegate {
         let region = MKCoordinateRegion.init(center: center, latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
         mapView.setRegion(region, animated: true)
         
+        if(mapView.userLocation.isUpdating){
         previousLocations.append(location)
         
+        //print("User's updating location: \(location.coordinate.latitude),\(location.coordinate.longitude) ")
         
-        print("User's updating location: \(location.coordinate.latitude),\(location.coordinate.longitude) ")
+        //print("locations items #: \(previousLocations.count)")
         
-        print("locations items #: \(previousLocations.count)")
+        }
         
-        print("user location: \(userLocation!)")
         
     }
     
