@@ -13,6 +13,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    var requestedRoutePoints: [CLLocationCoordinate2D] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,10 +21,10 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         self.mapView.delegate = self
         
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 40.7127, longitude: -74.0059), addressDictionary: nil))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 37.783333, longitude: -122.416667), addressDictionary: nil))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 42.001783, longitude: 21.405396), addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 42.0044269, longitude: 21.3894716), addressDictionary:nil))
         request.requestsAlternateRoutes = true
-        request.transportType = .automobile
+        request.transportType = .walking
         
         let directions = MKDirections(request: request)
         
@@ -40,8 +41,36 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
         renderer.strokeColor = UIColor.green
-        //renderer.applyFillProperties(to: <#T##CGContext#>, atZoomScale: <#T##MKZoomScale#>)
-        print("renderer")
+        
+        let polyline = overlay as! MKPolyline
+        var polyLinePoints = polyline.points()
+
+        
+        
+        var i = 0
+        while i < polyline.pointCount {
+        
+            requestedRoutePoints.append(polyLinePoints.pointee.coordinate)
+            print("polyline pointee coordinate: \(polyLinePoints.pointee.coordinate)")
+            
+            let pinPoint = MyAnnotations(title: "pin",
+                                  locationName: ".",
+                                  discipline: ".",
+                                  coordinate:polyLinePoints.pointee.coordinate )
+            mapView.addAnnotation(pinPoint)
+
+         polyLinePoints = polyLinePoints.successor()
+            i = i + 1
+        }
+        
+        print("Finished iterating the points.....")
+        
+        
+        
+        
+        
+        print("requestedRoutePoints array number of elements \(requestedRoutePoints.count)")
+        
         return renderer
     }
     
