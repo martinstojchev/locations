@@ -18,6 +18,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     let startPointCoordinates = CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115)
     let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405)
     var routeSteps: [MKRoute.Step] = []
+    var pinPointsCoordinate: [CLLocationCoordinate2D] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +43,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
                 self.mapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
                 self.routeSteps = route.steps
                 self.printRouteSteps(steps: self.routeSteps)
-                
+                self.addPinPointsToMap(pinPointsCoordinate: self.pinPointsCoordinate, rootSteps: self.routeSteps)
             }
         }
     }
@@ -52,6 +53,39 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         for routeStep in steps {
             print("routeStep: \(routeStep.instructions, routeStep.polyline.coordinate)")
         }
+    }
+    
+    func addPinPointsToMap(pinPointsCoordinate: [CLLocationCoordinate2D], rootSteps: [MKRoute.Step]) {
+        
+        for pinPoint in pinPointsCoordinate {
+            
+            let pinLatitude  = pinPoint.latitude
+            let pinLongitude = pinPoint.longitude
+            var stepDirection = ""
+            
+            for step in rootSteps {
+                
+                let stepLatitude  = step.polyline.coordinate.latitude
+                let stepLongitude = step.polyline.coordinate.longitude
+                
+                if (stepLatitude == pinLatitude && stepLongitude == pinLongitude){
+                    
+                    
+                    stepDirection = step.instructions
+                }
+                
+            }
+            
+            let pinAnnotation = MyAnnotations(title: "",
+                                              locationName: stepDirection,
+                                              discipline: "",
+                                              coordinate: pinPoint)
+            
+            mapView.addAnnotation(pinAnnotation)
+            
+        }
+        
+        
     }
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
@@ -89,16 +123,19 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
             print("polyline pointee coordinate: \(polyLinePoints.pointee.coordinate)")
             
             
-            let pinPoint = MyAnnotations(title: "pin",
-                                  locationName: "\(polyLinePoints.pointee.coordinate.latitude), \(polyLinePoints.pointee.coordinate.longitude)",
-                                  discipline: ".",
-                                  coordinate:polyLinePoints.pointee.coordinate )
-            mapView.addAnnotation(pinPoint)
+//            let pinPoint = MyAnnotations(title: "pin",
+//                                  locationName: "\(polyLinePoints.pointee.coordinate.latitude), \(polyLinePoints.pointee.coordinate.longitude)",
+//                                  discipline: ".",
+//                                  coordinate:polyLinePoints.pointee.coordinate )
+//            mapView.addAnnotation(pinPoint)
+            pinPointsCoordinate.append(polyLinePoints.pointee.coordinate)
+            
 
          polyLinePoints = polyLinePoints.successor()
             i = i + 1
         }
         
+        //print("pinPointsCoordinate count: \(pinPointsCoordinate.count)")
         print("Finished iterating the points.....")
         
         //pin the ending point
