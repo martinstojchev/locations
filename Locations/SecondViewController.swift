@@ -13,23 +13,34 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    let locationManager = CLLocationManager()
     var requestedRoutePoints: [CLLocationCoordinate2D] = []
     
     let startPointCoordinates = CLLocationCoordinate2D(latitude: 42.00330699475713, longitude: 21.405449509620667)
-    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99952385292592, longitude: 21.42538905143738)
+    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.9986109220007, longitude: 21.418758630752567)
     var routeSteps: [MKRoute.Step] = []
     var pinPointsCoordinate: [CLLocationCoordinate2D] = []
+    var usersCurrenLocation: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        checkLocationServices()
+        
         self.mapView.delegate = self
         
+        
+       
+    }
+    
+    func requestRoute(userLocation: CLLocationCoordinate2D){
+        
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: startPointCoordinates, addressDictionary: nil))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: userLocation, addressDictionary: nil))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endPointCoordinates, addressDictionary:nil))
         request.requestsAlternateRoutes = true
-        request.transportType = .automobile
+        request.transportType = .walking
         
         let directions = MKDirections(request: request)
         
@@ -150,8 +161,68 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         return renderer
     }
     
+    func setupLocationManager() {
+        
+       // locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+    }
     
-
+    
+    func checkLocationServices() {
+        
+        if CLLocationManager.locationServicesEnabled() {
+            //setup our location manager
+            setupLocationManager()
+            checkLocationAuthorization()
+            
+            
+            
+        }
+        else {
+            // Show alert letting the user know they have to turn this on.
+        }
+        
+        
+    }
+    
+    func checkLocationAuthorization(){
+        
+        switch CLLocationManager.authorizationStatus(){
+            
+        case .authorizedWhenInUse:
+            
+            mapView.showsUserLocation = true
+            //centerViewOnUserLocation()
+            print("authorization when in use")
+            locationManager.startUpdatingLocation()
+            
+            break
+        case .denied:
+            break
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .restricted:
+            break
+        case .authorizedAlways:
+            break
+            
+            
+        }
+        
+    }
+    
+    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+        //print("Updating user's location: \(userLocation.coordinate)")
+        
+        
+        if (usersCurrenLocation.latitude == 0 && usersCurrenLocation.longitude == 0) {
+            usersCurrenLocation = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
+            print("User's current location: \(usersCurrenLocation)")
+            requestRoute(userLocation: usersCurrenLocation)
+        }
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -163,3 +234,31 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     */
 
 }
+
+//extension ViewController: CLLocationManagerDelegate {
+//
+//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//
+//        guard let location = locations.last else {return}
+//        let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+//        let region = MKCoordinateRegion.init(center: center, latitudinalMeters: regionInMeters, longitudinalMeters: regionInMeters)
+//        mapView.setRegion(region, animated: true)
+//
+//        if(mapView.userLocation.isUpdating){
+//            previousLocations.append(location)
+//
+//            //print("User's updating location: \(location.coordinate.latitude),\(location.coordinate.longitude) ")
+//
+//            //print("locations items #: \(previousLocations.count)")
+//
+//        }
+//
+//
+//    }
+//
+//    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+//        //we'll be back
+//        checkLocationAuthorization()
+//    }
+//
+//}
