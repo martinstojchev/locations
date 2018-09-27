@@ -9,15 +9,14 @@
 import UIKit
 import MapKit
 
-class SecondViewController: UIViewController, MKMapViewDelegate {
+class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecognizerDelegate {
 
     @IBOutlet weak var mapView: MKMapView!
     
     let locationManager = CLLocationManager()
     var requestedRoutePoints: [CLLocationCoordinate2D] = []
-    
-    let startPointCoordinates = CLLocationCoordinate2D(latitude: 42.00330699475713, longitude: 21.405449509620667)
-    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.9986109220007, longitude: 21.418758630752567)
+    var startPointCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
+    var endPointCoordinates: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     var routeSteps: [MKRoute.Step] = []
     var pinPointsCoordinate: [CLLocationCoordinate2D] = []
     var usersCurrenLocation: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
@@ -29,16 +28,48 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         checkLocationServices()
         
         self.mapView.delegate = self
+        self.setupGesture()
+        
         
         
        
     }
     
-    func requestRoute(userLocation: CLLocationCoordinate2D){
+    func setupGesture() {
+        
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(SecondViewController.handleLongPress(gestureRecognizer:)))
+        longPressGesture.minimumPressDuration = 0.5
+        longPressGesture.delaysTouchesBegan = true
+        longPressGesture.delegate = self
+        self.mapView.addGestureRecognizer(longPressGesture)
+        
+    }
+    
+    @objc func handleLongPress(gestureRecognizer: UILongPressGestureRecognizer){
+        
+        if gestureRecognizer.state != UIGestureRecognizer.State.ended {
+            
+            let touchLocation = gestureRecognizer.location(in: mapView)
+            let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
+            print("Tapped location: \(locationCoordinate.latitude),\(locationCoordinate.longitude)")
+            requestRoute(endLocation: locationCoordinate)
+            return
+        }
+        
+        if gestureRecognizer.state != UIGestureRecognizer.State.began {
+            return
+        }
+        
+    }
+    
+    func requestRoute(endLocation: CLLocationCoordinate2D){
+        
+         startPointCoordinates = usersCurrenLocation
+         endPointCoordinates   = endLocation
         
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: userLocation, addressDictionary: nil))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endPointCoordinates, addressDictionary:nil))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: usersCurrenLocation, addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endLocation, addressDictionary:nil))
         request.requestsAlternateRoutes = true
         request.transportType = .walking
         
@@ -219,9 +250,11 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         if (usersCurrenLocation.latitude == 0 && usersCurrenLocation.longitude == 0) {
             usersCurrenLocation = CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude)
             print("User's current location: \(usersCurrenLocation)")
-            requestRoute(userLocation: usersCurrenLocation)
+            
         }
     }
+    
+  
     
     /*
     // MARK: - Navigation
