@@ -17,6 +17,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     
     let startPointCoordinates = CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115)
     let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405)
+    var routeSteps: [MKRoute.Step] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,13 +32,25 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         
         let directions = MKDirections(request: request)
         
+        
+        
         directions.calculate { [unowned self] response, error in
             guard let unwrappedResponse = response else { return }
             
             for route in unwrappedResponse.routes {
                 self.mapView.addOverlay(route.polyline)
                 self.mapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
+                self.routeSteps = route.steps
+                self.printRouteSteps(steps: self.routeSteps)
+                
             }
+        }
+    }
+    
+    func printRouteSteps(steps: [MKRoute.Step]) {
+        
+        for routeStep in steps {
+            print("routeStep: \(routeStep.instructions, routeStep.polyline.coordinate)")
         }
     }
     
@@ -73,9 +86,11 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         
             requestedRoutePoints.append(polyLinePoints.pointee.coordinate)
             print("polyline pointee coordinate: \(polyLinePoints.pointee.coordinate)")
+            print("polyline pointee coordinate: \(polyLinePoints.pointee.coordinate)")
+            
             
             let pinPoint = MyAnnotations(title: "pin",
-                                  locationName: ".",
+                                  locationName: "\(polyLinePoints.pointee.coordinate.latitude), \(polyLinePoints.pointee.coordinate.longitude)",
                                   discipline: ".",
                                   coordinate:polyLinePoints.pointee.coordinate )
             mapView.addAnnotation(pinPoint)
