@@ -15,6 +15,9 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     
     var requestedRoutePoints: [CLLocationCoordinate2D] = []
     
+    let startPointCoordinates = CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115)
+    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -47,6 +50,24 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
 
         
         
+        
+        
+        
+         let startingLocationPin = MyAnnotations(title: "Start",
+                                                 locationName: "Start point",
+                                                 discipline: "",
+                                                 coordinate: startPointCoordinates
+                                                )
+        
+        let endingLocationPin    = MyAnnotations(title: "End",
+                                                 locationName: "End point",
+                                                 discipline: "",
+                                                 coordinate: endPointCoordinates
+                                                )
+        
+        //pin the starting point
+        mapView.addAnnotation(startingLocationPin)
+        
         var i = 0
         while i < polyline.pointCount {
         
@@ -64,6 +85,9 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         }
         
         print("Finished iterating the points.....")
+        
+        //pin the ending point
+        mapView.addAnnotation(endingLocationPin)
         
         
         
