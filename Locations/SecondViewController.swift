@@ -15,8 +15,8 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
     
     var requestedRoutePoints: [CLLocationCoordinate2D] = []
     
-    let startPointCoordinates = CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115)
-    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405)
+    let startPointCoordinates = CLLocationCoordinate2D(latitude: 42.00330699475713, longitude: 21.405449509620667)
+    let endPointCoordinates   = CLLocationCoordinate2D(latitude: 41.99952385292592, longitude: 21.42538905143738)
     var routeSteps: [MKRoute.Step] = []
     var pinPointsCoordinate: [CLLocationCoordinate2D] = []
     
@@ -26,10 +26,10 @@ class SecondViewController: UIViewController, MKMapViewDelegate {
         self.mapView.delegate = self
         
         let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.99835577739175, longitude: 21.42714858055115), addressDictionary: nil))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.99571656532669, longitude: 21.420711278915405), addressDictionary:nil))
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: startPointCoordinates, addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: endPointCoordinates, addressDictionary:nil))
         request.requestsAlternateRoutes = true
-        request.transportType = .walking
+        request.transportType = .automobile
         
         let directions = MKDirections(request: request)
         
