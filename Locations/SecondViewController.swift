@@ -146,8 +146,26 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
-        renderer.strokeColor = UIColor.green
-        renderer.alpha = 0.1
+        
+        //renderer.alpha = 0.1
+        
+        print("overlays count: \(mapView.overlays.count)")
+        //coloring the routes
+        if(overlay is MKPolyline){
+
+            print("overlay is MKPolyline")
+            if mapView.overlays.count == 1 {
+                 renderer.strokeColor = UIColor.blue.withAlphaComponent(0.5)
+            }
+            else if (mapView.overlays.count == 2) {
+              renderer.strokeColor = UIColor.green.withAlphaComponent(0.5)
+            }
+            else if (mapView.overlays.count == 3) {
+                renderer.strokeColor = UIColor.red.withAlphaComponent(0.5)
+            }
+        }
+        
+        
         
         let polyline = overlay as! MKPolyline
         var polyLinePoints = polyline.points()
