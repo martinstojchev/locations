@@ -4,6 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -52,17 +53,29 @@
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="satellite" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1w2-DQ-t8Y">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </mapView>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PpU-aC-7Rw">
+                                <rect key="frame" x="16" y="617" width="92" height="30"/>
+                                <state key="normal" title="Cancel Route">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="cancelRoute:" destination="DAb-Xu-uT0" eventType="touchUpInside" id="uoC-p2-laA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="1w2-DQ-t8Y" secondAttribute="trailing" id="6uV-et-aKn"/>
                             <constraint firstItem="1w2-DQ-t8Y" firstAttribute="leading" secondItem="vba-Pq-9Z9" secondAttribute="leading" id="DEk-e1-vZ3"/>
+                            <constraint firstItem="PpU-aC-7Rw" firstAttribute="leading" secondItem="yzA-jA-b2U" secondAttribute="leading" constant="16" id="K4W-SC-iB7"/>
+                            <constraint firstItem="yzA-jA-b2U" firstAttribute="bottom" secondItem="PpU-aC-7Rw" secondAttribute="bottom" constant="20" id="bpO-Ny-TH3"/>
                             <constraint firstItem="1w2-DQ-t8Y" firstAttribute="top" secondItem="vba-Pq-9Z9" secondAttribute="top" id="kiT-uq-QuH"/>
                             <constraint firstAttribute="bottom" secondItem="1w2-DQ-t8Y" secondAttribute="bottom" id="ng5-j6-FKs"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="yzA-jA-b2U"/>
                     </view>
                     <connections>
+                        <outlet property="cancelButton" destination="PpU-aC-7Rw" id="W2N-Wn-hNE"/>
                         <outlet property="mapView" destination="1w2-DQ-t8Y" id="mWl-Kg-TLr"/>
                     </connections>
                 </viewController>

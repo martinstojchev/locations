@@ -21,6 +21,12 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
     var pinPointsCoordinate: [CLLocationCoordinate2D] = []
     var usersCurrenLocation: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     
+    var directionsForRoute:[MKDirections] = []
+    var annotationsOnMap: [MyAnnotations] = []
+    
+    @IBOutlet weak var cancelButton: UIButton!
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +59,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
             let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
             print("Tapped location: \(locationCoordinate.latitude),\(locationCoordinate.longitude)")
             requestRoute(endLocation: locationCoordinate)
+            cancelButton.isHidden = false
             return
         }
         
@@ -75,6 +82,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
         
         let directions = MKDirections(request: request)
         
+        directionsForRoute.append(directions)
         
         
         directions.calculate { [unowned self] response, error in
@@ -86,8 +94,12 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
                 self.routeSteps = route.steps
                 self.printRouteSteps(steps: self.routeSteps)
                 self.addPinPointsToMap(pinPointsCoordinate: self.pinPointsCoordinate, rootSteps: self.routeSteps)
+                
+                
             }
         }
+        
+      
     }
     
     func printRouteSteps(steps: [MKRoute.Step]) {
@@ -123,6 +135,8 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
                                               discipline: "",
                                               coordinate: pinPoint)
             
+            annotationsOnMap.append(pinAnnotation)
+            
             mapView.addAnnotation(pinAnnotation)
             
         }
@@ -133,6 +147,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
         renderer.strokeColor = UIColor.green
+        renderer.alpha = 0.1
         
         let polyline = overlay as! MKPolyline
         var polyLinePoints = polyline.points()
@@ -155,6 +170,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
                                                 )
         
         //pin the starting point
+        annotationsOnMap.append(startingLocationPin)
         mapView.addAnnotation(startingLocationPin)
         
         var i = 0
@@ -181,6 +197,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
         print("Finished iterating the points.....")
         
         //pin the ending point
+        annotationsOnMap.append(endingLocationPin)
         mapView.addAnnotation(endingLocationPin)
         
         
@@ -255,6 +272,24 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
     }
     
   
+    @IBAction func cancelRoute(_ sender: Any) {
+    
+        //print("directionsForRoute count: \(directionsForRoute.count)")
+        
+        mapView.removeAnnotations(annotationsOnMap)
+        pinPointsCoordinate = []
+    
+        //print("Annotations removed from map")
+        
+        if mapView.overlays.count > 0 {
+        
+            mapView.removeOverlays(mapView.overlays)
+            
+    
+        }
+        cancelButton.isHidden = true
+    }
+    
     
     /*
     // MARK: - Navigation
