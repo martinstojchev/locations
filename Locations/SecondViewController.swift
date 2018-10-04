@@ -20,7 +20,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
     var routeSteps: [MKRoute.Step] = []
     var pinPointsCoordinate: [CLLocationCoordinate2D] = []
     var usersCurrenLocation: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
-    
+    var requestedRouteForTap: Bool = false
     var directionsForRoute:[MKDirections] = []
     var annotationsOnMap: [MyAnnotations] = []
     
@@ -55,12 +55,17 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
         
         if gestureRecognizer.state != UIGestureRecognizer.State.ended {
             
+            if requestedRouteForTap == false {
+            requestedRouteForTap = true
+                
             let touchLocation = gestureRecognizer.location(in: mapView)
             let locationCoordinate = mapView.convert(touchLocation, toCoordinateFrom: mapView)
             print("Tapped location: \(locationCoordinate.latitude),\(locationCoordinate.longitude)")
             requestRoute(endLocation: locationCoordinate)
             cancelButton.isHidden = false
             return
+            
+            }
         }
         
         if gestureRecognizer.state != UIGestureRecognizer.State.began {
@@ -88,15 +93,21 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
         directions.calculate { [unowned self] response, error in
             guard let unwrappedResponse = response else { return }
             
-            for route in unwrappedResponse.routes {
-                self.mapView.addOverlay(route.polyline)
-                self.mapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
-                self.routeSteps = route.steps
+            var allRoutes = unwrappedResponse.routes
+            let bestRoute = allRoutes.sorted(by: {$0.expectedTravelTime <
+                $1.expectedTravelTime})[0]
+            
+      
+            //for route in unwrappedResponse.routes {
+                
+                self.mapView.addOverlay(bestRoute.polyline)
+                self.mapView.setVisibleMapRect(bestRoute.polyline.boundingMapRect, animated: true)
+                self.routeSteps = bestRoute.steps
                 self.printRouteSteps(steps: self.routeSteps)
                 self.addPinPointsToMap(pinPointsCoordinate: self.pinPointsCoordinate, rootSteps: self.routeSteps)
                 
-                
-            }
+                print("best route showed")
+            //}
         }
         
       
@@ -211,11 +222,19 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
             i = i + 1
         }
         
-        //print("pinPointsCoordinate count: \(pinPointsCoordinate.count)")
+        for ppCoordinate in pinPointsCoordinate {
+        
+            
+            print("pinPointsCoordinate: lat:\(ppCoordinate.latitude), lon:\(ppCoordinate.longitude)")
+        
+        }
+        
+        print("pinPointsCoordinate count: \(pinPointsCoordinate.count)")
         print("Finished iterating the points.....")
         
         //pin the ending point
         annotationsOnMap.append(endingLocationPin)
+        print("endPointCoordinate: lat: \(endingLocationPin.coordinate.latitude), lon: \(endingLocationPin.coordinate.longitude)")
         mapView.addAnnotation(endingLocationPin)
         
         
@@ -305,6 +324,7 @@ class SecondViewController: UIViewController, MKMapViewDelegate,UIGestureRecogni
             
     
         }
+        requestedRouteForTap = false
         cancelButton.isHidden = true
     }
     
